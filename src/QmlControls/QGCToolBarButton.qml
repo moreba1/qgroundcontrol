@@ -15,7 +15,7 @@ import QGroundControl.Controls      1.0
 import QGroundControl.Palette       1.0
 import QGroundControl.ScreenTools   1.0
 
-Item {
+FocusScope {
     id:     _root
     width:  height
     state:  "HelpShown"
@@ -70,6 +70,7 @@ Item {
         anchors.fill: parent
         onClicked: {
             checked = true
+            _root.focus = true
             _root.clicked()
         }
     }
