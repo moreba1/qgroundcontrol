@@ -59,7 +59,7 @@ Rectangle {
         QGCCheckBox {
             id:             loiterAltRelative
             anchors.right:  parent.right
-            text:           qsTr("Altitude relative to home")
+            text:           qsTr("Loiter alt relative to home")
             checked:        missionItem.loiterAltitudeRelative
             onClicked:      missionItem.loiterAltitudeRelative = checked
         }
@@ -82,19 +82,19 @@ Rectangle {
             anchors.right:   parent.right
             columns:         2
 
-                QGCLabel { text: missionItem.landingHeading.name }
+            QGCLabel { text: missionItem.landingHeading.name }
 
-                FactTextField {
-                    Layout.fillWidth:   true
-                    fact:               missionItem.landingHeading
-                }
+            FactTextField {
+                Layout.fillWidth:   true
+                fact:               missionItem.landingHeading
+            }
 
-                QGCLabel { text: missionItem.landingAltitude.name }
+            QGCLabel { text: missionItem.landingAltitude.name }
 
-                FactTextField {
-                    Layout.fillWidth:   true
-                    fact:               missionItem.landingAltitude
-                }
+            FactTextField {
+                Layout.fillWidth:   true
+                fact:               missionItem.landingAltitude
+            }
 
             QGCRadioButton {
                 id:                     useLandingDistance
@@ -151,9 +151,41 @@ Rectangle {
 
         QGCCheckBox {
             anchors.right:  parent.right
-            text:           qsTr("Altitude relative to home")
+            text:           qsTr("Landing alt relative to home")
             checked:        missionItem.landingAltitudeRelative
             onClicked:      missionItem.landingAltitudeRelative = checked
+        }
+
+        SectionHeader { text: qsTr("Landing speed") }
+
+        Item { width: 1; height: _spacer }
+
+        RowLayout {
+            QGCCheckBox {
+                id:         landingSpeedCheckbox
+                checked:    !isNaN(missionItem.landingSpeed.rawValue)
+                onClicked: {
+                    if (checked) {
+                        if (isNaN(missionItem.landingSpeed.rawDefaultValue)) {
+                            missionItem.landingSpeed.rawValue = 15
+                        } else {
+                            missionItem.landingSpeed.rawValue = missionItem.landingSpeed.rawDefaultValue
+                        }
+                    } else {
+                        missionItem.landingSpeed.rawValue = Number.NaN
+                    }
+                }
+
+                Connections {
+                    target: missionItem.landingSpeed
+                    onRawValueChanged: landingSpeedCheckbox.checked = !isNaN(missionItem.landingSpeed.rawValue)
+                }
+            }
+
+            FactTextField {
+                fact:       missionItem.landingSpeed
+                enabled:    landingSpeedCheckbox.checked
+            }
         }
     }
 
@@ -164,14 +196,6 @@ Rectangle {
         anchors.right:      parent.right
         visible:            !missionItem.landingCoordSet
         spacing:            ScreenTools.defaultFontPixelHeight
-
-        QGCLabel {
-            anchors.left:   parent.left
-            anchors.right:  parent.right
-            wrapMode:       Text.WordWrap
-            font.pointSize: ScreenTools.smallFontPointSize
-            text:           qsTr("WIP (NOT FOR REAL FLIGHT!)")
-        }
 
         QGCLabel {
             anchors.left:   parent.left

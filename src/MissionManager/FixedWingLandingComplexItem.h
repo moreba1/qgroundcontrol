@@ -7,8 +7,7 @@
  *
  ****************************************************************************/
 
-#ifndef FixedWingLandingComplexItem_H
-#define FixedWingLandingComplexItem_H
+#pragma once
 
 #include "ComplexMissionItem.h"
 #include "MissionItem.h"
@@ -29,7 +28,8 @@ public:
     Q_PROPERTY(Fact*            landingAltitude         READ    landingAltitude                                                 CONSTANT)
     Q_PROPERTY(Fact*            landingDistance         READ    landingDistance                                                 CONSTANT)
     Q_PROPERTY(Fact*            landingHeading          READ    landingHeading                                                  CONSTANT)
-    Q_PROPERTY(Fact*            fallRate                READ    fallRate                                                    CONSTANT)
+    Q_PROPERTY(Fact*            fallRate                READ    fallRate                                                        CONSTANT)
+    Q_PROPERTY(Fact*            landingSpeed            READ    landingSpeed                                                    CONSTANT)
     Q_PROPERTY(bool             loiterClockwise         MEMBER  _loiterClockwise                                                NOTIFY loiterClockwiseChanged)
     Q_PROPERTY(bool             loiterAltitudeRelative  MEMBER  _loiterAltitudeRelative                                         NOTIFY loiterAltitudeRelativeChanged)
     Q_PROPERTY(bool             landingAltitudeRelative MEMBER  _landingAltitudeRelative                                        NOTIFY landingAltitudeRelativeChanged)
@@ -44,6 +44,7 @@ public:
     Fact*           landingDistance         (void) { return &_landingDistanceFact; }
     Fact*           landingHeading          (void) { return &_landingHeadingFact; }
     Fact*           fallRate                (void) { return &_fallRateFact; }
+    Fact*           landingSpeed            (void) { return &_landingSpeedFact; }
     QGeoCoordinate  landingCoordinate       (void) const { return _landingCoordinate; }
     QGeoCoordinate  loiterCoordinate        (void) const { return _loiterCoordinate; }
     QGeoCoordinate  loiterTangentCoordinate (void) const { return _loiterTangentCoordinate; }
@@ -127,6 +128,7 @@ private:
     Fact            _landingHeadingFact;
     Fact            _landingAltitudeFact;
     Fact            _fallRateFact;
+    Fact            _landingSpeedFact;
 
     bool            _loiterClockwise;
     bool            _loiterAltitudeRelative;
@@ -140,6 +142,7 @@ private:
     static const char* _landingHeadingName;
     static const char* _landingAltitudeName;
     static const char* _fallRateName;
+    static const char* _landingSpeedName;
 
     static const char* _jsonLoiterCoordinateKey;
     static const char* _jsonLoiterRadiusKey;
@@ -148,6 +151,5 @@ private:
     static const char* _jsonLandingCoordinateKey;
     static const char* _jsonLandingAltitudeRelativeKey;
     static const char* _jsonFallRateKey;
+    static const char* _jsonLandingSpeedKey;
 };
-
-#endif

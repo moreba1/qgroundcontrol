@@ -26,6 +26,7 @@ const char* FixedWingLandingComplexItem::_loiterAltitudeName =          "Loiter 
 const char* FixedWingLandingComplexItem::_loiterRadiusName =            "Loiter radius";
 const char* FixedWingLandingComplexItem::_landingAltitudeName =         "Landing altitude";
 const char* FixedWingLandingComplexItem::_fallRateName =                "Descent rate";
+const char* FixedWingLandingComplexItem::_landingSpeedName =            "Landing speed";
 
 const char* FixedWingLandingComplexItem::_jsonLoiterCoordinateKey =         "loiterCoordinate";
 const char* FixedWingLandingComplexItem::_jsonLoiterRadiusKey =             "loiterRadius";
@@ -34,24 +35,26 @@ const char* FixedWingLandingComplexItem::_jsonLoiterAltitudeRelativeKey =   "loi
 const char* FixedWingLandingComplexItem::_jsonLandingCoordinateKey =        "landCoordinate";
 const char* FixedWingLandingComplexItem::_jsonLandingAltitudeRelativeKey =  "landAltitudeRelative";
 const char* FixedWingLandingComplexItem::_jsonFallRateKey =                 "fallRate";
+const char* FixedWingLandingComplexItem::_jsonLandingSpeedKey =             "landingSpeed";
 
 QMap<QString, FactMetaData*> FixedWingLandingComplexItem::_metaDataMap;
 
 FixedWingLandingComplexItem::FixedWingLandingComplexItem(Vehicle* vehicle, QObject* parent)
-    : ComplexMissionItem(vehicle, parent)
-    , _sequenceNumber(0)
-    , _dirty(false)
-    , _landingCoordSet(false)
-    , _ignoreRecalcSignals(false)
-    , _landingDistanceFact  (0, _loiterToLandDistanceName,  FactMetaData::valueTypeDouble)
-    , _loiterAltitudeFact   (0, _loiterAltitudeName,        FactMetaData::valueTypeDouble)
-    , _loiterRadiusFact     (0, _loiterRadiusName,          FactMetaData::valueTypeDouble)
-    , _landingHeadingFact   (0, _landingHeadingName,        FactMetaData::valueTypeDouble)
-    , _landingAltitudeFact  (0, _landingAltitudeName,       FactMetaData::valueTypeDouble)
-    , _fallRateFact         (0, _fallRateName,              FactMetaData::valueTypeDouble)
-    , _loiterClockwise(true)
-    , _loiterAltitudeRelative(true)
-    , _landingAltitudeRelative(true)
+    : ComplexMissionItem        (vehicle, parent)
+    , _sequenceNumber           (0)
+    , _dirty                    (false)
+    , _landingCoordSet          (false)
+    , _ignoreRecalcSignals      (false)
+    , _landingDistanceFact      (0, _loiterToLandDistanceName,  FactMetaData::valueTypeDouble)
+    , _loiterAltitudeFact       (0, _loiterAltitudeName,        FactMetaData::valueTypeDouble)
+    , _loiterRadiusFact         (0, _loiterRadiusName,          FactMetaData::valueTypeDouble)
+    , _landingHeadingFact       (0, _landingHeadingName,        FactMetaData::valueTypeDouble)
+    , _landingAltitudeFact      (0, _landingAltitudeName,       FactMetaData::valueTypeDouble)
+    , _fallRateFact             (0, _fallRateName,              FactMetaData::valueTypeDouble)
+    , _landingSpeedFact         (0, _landingSpeedName,          FactMetaData::valueTypeDouble)
+    , _loiterClockwise          (true)
+    , _loiterAltitudeRelative   (true)
+    , _landingAltitudeRelative  (true)
 {
     _editorQml = "qrc:/qml/FWLandingPatternEditor.qml";
 
@@ -65,6 +68,7 @@ FixedWingLandingComplexItem::FixedWingLandingComplexItem(Vehicle* vehicle, QObje
     _landingHeadingFact.setMetaData     (_metaDataMap[_landingHeadingName]);
     _landingAltitudeFact.setMetaData    (_metaDataMap[_landingAltitudeName]);
     _fallRateFact.setMetaData           (_metaDataMap[_fallRateName]);
+    _landingSpeedFact.setMetaData       (_metaDataMap[_landingSpeedName]);
 
     _landingDistanceFact.setRawValue    (_landingDistanceFact.rawDefaultValue());
     _loiterAltitudeFact.setRawValue     (_loiterAltitudeFact.rawDefaultValue());
@@ -72,6 +76,7 @@ FixedWingLandingComplexItem::FixedWingLandingComplexItem(Vehicle* vehicle, QObje
     _landingHeadingFact.setRawValue     (_landingHeadingFact.rawDefaultValue());
     _landingAltitudeFact.setRawValue    (_landingAltitudeFact.rawDefaultValue());
     _fallRateFact.setRawValue           (_fallRateFact.rawDefaultValue());
+    _landingSpeedFact.setRawValue       (_landingSpeedFact.rawDefaultValue());
 
     connect(&_loiterAltitudeFact,       &Fact::valueChanged,                                    this, &FixedWingLandingComplexItem::_updateLoiterCoodinateAltitudeFromFact);
     connect(&_landingAltitudeFact,      &Fact::valueChanged,                                    this, &FixedWingLandingComplexItem::_updateLandingCoodinateAltitudeFromFact);
@@ -90,6 +95,7 @@ FixedWingLandingComplexItem::FixedWingLandingComplexItem(Vehicle* vehicle, QObje
     connect(&_landingDistanceFact,      &Fact::valueChanged,                                            this, &FixedWingLandingComplexItem::_setDirty);
     connect(&_landingHeadingFact,       &Fact::valueChanged,                                            this, &FixedWingLandingComplexItem::_setDirty);
     connect(&_loiterRadiusFact,         &Fact::valueChanged,                                            this, &FixedWingLandingComplexItem::_setDirty);
+    connect(&_landingSpeedFact,         &Fact::valueChanged,                                            this, &FixedWingLandingComplexItem::_setDirty);
     connect(this,                       &FixedWingLandingComplexItem::loiterCoordinateChanged,          this, &FixedWingLandingComplexItem::_setDirty);
     connect(this,                       &FixedWingLandingComplexItem::landingCoordinateChanged,         this, &FixedWingLandingComplexItem::_setDirty);
     connect(this,                       &FixedWingLandingComplexItem::loiterClockwiseChanged,           this, &FixedWingLandingComplexItem::_setDirty);
@@ -102,8 +108,9 @@ FixedWingLandingComplexItem::FixedWingLandingComplexItem(Vehicle* vehicle, QObje
 
 int FixedWingLandingComplexItem::lastSequenceNumber(void) const
 {
-    // land start, loiter, land
-    return _sequenceNumber + 2;
+    return _sequenceNumber +
+            2 + // do land start, loiter, land
+            (qIsNaN(_landingSpeedFact.rawValue().toDouble()) ? 0 : 1);
 }
 
 void FixedWingLandingComplexItem::setDirty(bool dirty)
@@ -140,6 +147,10 @@ void FixedWingLandingComplexItem::save(QJsonArray&  missionItems)
     saveObject[_jsonLoiterAltitudeRelativeKey] =    _loiterAltitudeRelative;
     saveObject[_jsonLandingAltitudeRelativeKey] =   _landingAltitudeRelative;
 
+    if (!qIsNaN(_landingSpeedFact.rawValue().toDouble())) {
+        saveObject[_jsonLandingSpeedKey] = _landingSpeedFact.rawValue().toDouble();
+    }
+
     missionItems.append(saveObject);
 }
 
@@ -164,6 +175,7 @@ bool FixedWingLandingComplexItem::load(const QJsonObject& complexObject, int seq
         { _jsonLoiterAltitudeRelativeKey,               QJsonValue::Bool,   true },
         { _jsonLandingCoordinateKey,                    QJsonValue::Array,  true },
         { _jsonLandingAltitudeRelativeKey,              QJsonValue::Bool,   true },
+        { _jsonLandingSpeedKey,                         QJsonValue::Double, false },    // Optional since this does not exist in older builds
     };
     if (!JsonHelper::validateKeys(complexObject, keyInfoList, errorString)) {
         return false;
@@ -197,6 +209,10 @@ bool FixedWingLandingComplexItem::load(const QJsonObject& complexObject, int seq
     _loiterClockwise  = complexObject[_jsonLoiterClockwiseKey].toBool();
     _loiterAltitudeRelative = complexObject[_jsonLoiterAltitudeRelativeKey].toBool();
     _landingAltitudeRelative = complexObject[_jsonLandingAltitudeRelativeKey].toBool();
+
+    if (complexObject.contains(_jsonLandingSpeedKey)) {
+        _landingSpeedFact.setRawValue(JsonHelper::possibleNaNJsonValue(complexObject[_jsonLandingSpeedKey]));
+    }
 
     _landingCoordSet = true;
 
@@ -247,6 +263,22 @@ void FixedWingLandingComplexItem::appendMissionItems(QList<MissionItem*>& items,
                            missionItemParent);
     items.append(item);
 
+    if (!qIsNaN(_landingSpeedFact.rawValue().toDouble())) {
+        qDebug() << "Adding change speed" << _landingSpeedFact.rawValue().toDouble();
+        item = new MissionItem(seqNum++,
+                               MAV_CMD_DO_CHANGE_SPEED,
+                               MAV_FRAME_MISSION,
+                               0,                                       // Change airspeed
+                               _landingSpeedFact.rawValue().toDouble(),
+                               -1,                                      // No throttle change
+                               0,                                       // Absolute speed change
+                               0, 0, 0,                                 // param 5-7 not used
+                               true,                                    // autoContinue
+                               false,                                   // isCurrentItem
+                               missionItemParent);
+        items.append(item);
+    }
+
     item = new MissionItem(seqNum++,
                            MAV_CMD_NAV_LAND,
                            _landingAltitudeRelative ? MAV_FRAME_GLOBAL_RELATIVE_ALT : MAV_FRAME_GLOBAL,
@@ -279,6 +311,24 @@ bool FixedWingLandingComplexItem::scanForItem(QmlObjectListModel* visualItems, V
             !(missionItemLand.frame() == MAV_FRAME_GLOBAL_RELATIVE_ALT || missionItemLand.frame() == MAV_FRAME_GLOBAL) ||
             missionItemLand.param1() != 0 || missionItemLand.param2() != 0 || missionItemLand.param3() != 0 || missionItemLand.param4() == 1.0) {
         return false;
+    }
+
+    item = visualItems->value<SimpleMissionItem*>(lastItem--);
+    if (!item) {
+        return false;
+    }
+    bool foundChangeSpeed = false;
+    MissionItem& missionItemChangeSpeed = item->missionItem();
+    // MAV_CMD_DO_CHANGE_SPEED is optional
+    if (missionItemChangeSpeed.command() == MAV_CMD_DO_CHANGE_SPEED) {
+        if (missionItemChangeSpeed.frame() != MAV_FRAME_MISSION ||
+                missionItemChangeSpeed.param1() != 0 ||    // change airspeed
+                missionItemChangeSpeed.param3() != -1 ||   // no throttle change
+                missionItemChangeSpeed.param4() != 0 ||    // absolute speed change
+                missionItemChangeSpeed.param5() != 0 || missionItemChangeSpeed.param6() != 0 || missionItemChangeSpeed.param7() != 0) {
+            return false;
+        }
+        foundChangeSpeed = true;
     }
 
     item = visualItems->value<SimpleMissionItem*>(lastItem--);
@@ -319,6 +369,11 @@ bool FixedWingLandingComplexItem::scanForItem(QmlObjectListModel* visualItems, V
     complexItem->_landingCoordinate.setLatitude(missionItemLand.param5());
     complexItem->_landingCoordinate.setLongitude(missionItemLand.param6());
     complexItem->_landingAltitudeFact.setRawValue(missionItemLand.param7());
+    if (foundChangeSpeed) {
+        complexItem->_landingSpeedFact.setRawValue(missionItemChangeSpeed.param2());
+    } else {
+        complexItem->_landingSpeedFact.setRawValue(NAN);
+    }
 
     complexItem->_landingCoordSet = true;
 
@@ -330,6 +385,9 @@ bool FixedWingLandingComplexItem::scanForItem(QmlObjectListModel* visualItems, V
     visualItems->removeAt(lastItem--)->deleteLater();
     visualItems->removeAt(lastItem--)->deleteLater();
     visualItems->removeAt(lastItem--)->deleteLater();
+    if (foundChangeSpeed) {
+        visualItems->removeAt(lastItem--)->deleteLater();
+    }
 
     visualItems->append(complexItem);
 

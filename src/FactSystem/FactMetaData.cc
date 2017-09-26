@@ -155,7 +155,7 @@ QVariant FactMetaData::rawDefaultValue(void) const
 
 void FactMetaData::setRawDefaultValue(const QVariant& rawDefaultValue)
 {
-    if (_type == valueTypeString || (_rawMin <= rawDefaultValue && rawDefaultValue <= _rawMax)) {
+    if (_type == valueTypeString || qIsNaN(rawDefaultValue.toDouble()) || (_rawMin <= rawDefaultValue && rawDefaultValue <= _rawMax)) {
         _rawDefaultValue = rawDefaultValue;
         _defaultValueAvailable = true;
     } else {
@@ -862,7 +862,11 @@ FactMetaData* FactMetaData::createFromJsonObject(const QJsonObject& json, QObjec
         metaData->setRawUnits(json[_unitsJsonKey].toString());
     }
     if (json.contains(_defaultValueJsonKey)) {
-        metaData->setRawDefaultValue(json[_defaultValueJsonKey].toVariant());
+        if (type == valueTypeFloat || type == valueTypeDouble) {
+            metaData->setRawDefaultValue(JsonHelper::possibleNaNJsonValue(json[_defaultValueJsonKey]));
+        } else {
+            metaData->setRawDefaultValue(json[_defaultValueJsonKey].toVariant());
+        }
     }
     if (json.contains(_minJsonKey)) {
         QVariant typedValue;
