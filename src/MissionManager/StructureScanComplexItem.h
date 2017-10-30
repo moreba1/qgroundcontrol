@@ -26,6 +26,12 @@ class StructureScanComplexItem : public ComplexMissionItem
 public:
     StructureScanComplexItem(Vehicle* vehicle, QObject* parent = NULL);
 
+    Q_ENUMS(CameraSpecType)
+
+    Q_PROPERTY(CameraCalc*      cameraCalc      READ    cameraCalc          CONSTANT)
+    Q_PROPERTY(CameraSpecType   cameraSpecType  MEMBER  _cameraSpecType     NOTIFY cameraSpecTypeChanged)
+    Q_PROPERTY(QString          knownCameraName MEMBER  _knownCameraName    NOTIFY knownCameraNameChanged)
+
     Q_PROPERTY(Fact*            altitude                    READ altitude                       CONSTANT)
     Q_PROPERTY(Fact*            layers                      READ layers                         CONSTANT)
     Q_PROPERTY(Fact*            layerDistance               READ layerDistance                  CONSTANT)

@@ -494,9 +494,12 @@ QString Fact::group(void) const
     }
 }
 
-void Fact::setMetaData(FactMetaData* metaData)
+void Fact::setMetaData(FactMetaData* metaData, bool setDefaultFromMetaData)
 {
     _metaData = metaData;
+    if (setDefaultFromMetaData) {
+        setRawValue(rawDefaultValue());
+    }
     emit valueChanged(cookedValue());
 }
 

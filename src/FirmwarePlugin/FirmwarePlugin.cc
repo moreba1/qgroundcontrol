@@ -11,6 +11,7 @@
 #include "QGCApplication.h"
 #include "Generic/GenericAutoPilotPlugin.h"
 #include "CameraMetaData.h"
+#include "CameraSpec.h"
 #include "SettingsManager.h"
 #include "AppSettings.h"
 
@@ -20,7 +21,8 @@ static FirmwarePluginFactoryRegister* _instance = NULL;
 
 const QString guided_mode_not_supported_by_vehicle = QObject::tr("Guided mode not supported by Vehicle.");
 
-QVariantList FirmwarePlugin::_cameraList;
+QVariantList FirmwarePlugin::_cameraListOld;
+QmlObjectListModel FirmwarePlugin::_cameraList;
 
 const QString FirmwarePlugin::px4FollowMeFlightMode(QObject::tr("Follow Me"));
 
@@ -344,7 +346,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
 {
     Q_UNUSED(vehicle);
 
-    if (_cameraList.size() == 0) {
+    if (_cameraListOld.size() == 0) {
         CameraMetaData* metaData;
 
         metaData = new CameraMetaData(tr("Sony ILCE-QX1"),  //http://www.sony.co.uk/electronics/interchangeable-lens-cameras/ilce-qx1-body-kit/specifications
@@ -357,7 +359,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Canon S100 PowerShot"),
                                       7.6,
@@ -369,7 +371,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Canon G9 X PowerShot"),
                                       13.2,
@@ -381,7 +383,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Canon SX260 HS PowerShot"),
                                       6.17,
@@ -393,7 +395,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Canon EOS-M 22mm"),
                                       22.3,
@@ -405,7 +407,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Sony a6000 16mm"),    //http://www.sony.co.uk/electronics/interchangeable-lens-cameras/ilce-6000-body-kit#product_details_default
                                       23.5,
@@ -417,7 +419,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Sony RX100 II 28mm"),
                                       13.2,
@@ -429,7 +431,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,
                                       0,
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("Ricoh GR II"),
                                       23.7,     // sensorWidth
@@ -441,7 +443,7 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,    // fixedOrientation
                                       0,        // minTriggerInterval
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
 
         metaData = new CameraMetaData(tr("RedEdge"),
                                       4.8,      // sensorWidth
@@ -453,10 +455,129 @@ const QVariantList& FirmwarePlugin::cameraList(const Vehicle* vehicle)
                                       false,    // fixedOrientation
                                       0,        // minTriggerInterval
                                       this);
-        _cameraList.append(QVariant::fromValue(metaData));
+        _cameraListOld.append(QVariant::fromValue(metaData));
     }
 
-    return _cameraList;
+    return _cameraListOld;
+}
+
+QmlObjectListModel* FirmwarePlugin::cameraList2(const Vehicle* vehicle)
+{
+    Q_UNUSED(vehicle);
+
+    if (_cameraList.count() == 0) {
+        CameraSpec* cameraSpec;
+
+        cameraSpec = new CameraSpec(tr("Sony ILCE-QX1"),  //http://www.sony.co.uk/electronics/interchangeable-lens-cameras/ilce-qx1-body-kit/specifications
+                                      23.2,                 //http://www.sony.com/electronics/camera-lenses/sel16f28/specifications
+                                      15.4,
+                                      5456,
+                                      3632,
+                                      16,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Canon S100 PowerShot"),
+                                      7.6,
+                                      5.7,
+                                      4000,
+                                      3000,
+                                      5.2,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Canon G9 X PowerShot"),
+                                      13.2,
+                                      8.8,
+                                      5488,
+                                      3680,
+                                      10.2,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Canon SX260 HS PowerShot"),
+                                      6.17,
+                                      4.55,
+                                      4000,
+                                      3000,
+                                      4.5,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Canon EOS-M 22mm"),
+                                      22.3,
+                                      14.9,
+                                      5184,
+                                      3456,
+                                      22,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Sony a6000 16mm"),    //http://www.sony.co.uk/electronics/interchangeable-lens-cameras/ilce-6000-body-kit#product_details_default
+                                      23.5,
+                                      15.6,
+                                      6000,
+                                      4000,
+                                      16,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Sony RX100 II 28mm"),
+                                      13.2,
+                                      8.8,
+                                      5472,
+                                      3648,
+                                      10.4,
+                                      true,
+                                      false,
+                                      0,
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("Ricoh GR II"),
+                                      23.7,     // sensorWidth
+                                      15.7,     // sendsorHeight
+                                      4928,     // imageWidth
+                                      3264,     // imageHeight
+                                      18.3,     // focalLength
+                                      true,     // landscape
+                                      false,    // fixedOrientation
+                                      0,        // minTriggerInterval
+                                      this);
+        _cameraList.append(cameraSpec);
+
+        cameraSpec = new CameraSpec(tr("RedEdge"),
+                                      4.8,      // sensorWidth
+                                      3.6,      // sendsorHeight
+                                      1280,     // imageWidth
+                                      960,      // imageHeight
+                                      5.5,      // focalLength
+                                      true,     // landscape
+                                      false,    // fixedOrientation
+                                      0,        // minTriggerInterval
+                                      this);
+        _cameraList.append(cameraSpec);
+    }
+
+    return &_cameraList;
 }
 
 QMap<QString, FactGroup*>* FirmwarePlugin::factGroups(void) {

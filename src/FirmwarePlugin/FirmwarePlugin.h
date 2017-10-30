@@ -264,6 +264,10 @@ public:
     /// TODO: This should go into QGCCameraManager
     virtual const QVariantList& cameraList(const Vehicle* vehicle);
 
+    /// Returns a list of CameraSpec objects for available cameras on the vehicle.
+    /// TODO: This should go into QGCCameraManager
+    virtual QmlObjectListModel* cameraList2(const Vehicle* vehicle);
+
     /// Creates vehicle camera manager. Returns NULL if not supported.
     virtual QGCCameraManager* createCameraManager(Vehicle *vehicle);
 
@@ -309,7 +313,9 @@ protected:
 
 private:
     QVariantList _toolBarIndicatorList;
-    static QVariantList _cameraList;    ///< Standard QGC camera list
+
+    static QVariantList         _cameraListOld; ///< Standard QGC camera list
+    static QmlObjectListModel   _cameraList;    ///< Standard QGC camera list
 };
 
 class FirmwarePluginFactory : public QObject
